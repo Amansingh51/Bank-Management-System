@@ -1,0 +1,331 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History | CUB</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6fb;
+            color: #1e293b;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 245px;
+            background: #172554;
+            color: white;
+            padding: 25px 18px;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            padding-left: 10px;
+        }
+
+        .brand-name {
+            font-size: 10px;
+            color: #cbd5e1;
+            padding: 0 10px;
+            margin: 5px 0 35px;
+        }
+
+        .sidebar p {
+            color: #a5b4fc;
+            font-size: 11px;
+            margin: 20px 10px 12px;
+            text-transform: uppercase;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #e2e8f0;
+            text-decoration: none;
+            padding: 13px 12px;
+            margin-bottom: 6px;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #2563eb;
+        }
+
+        .main {
+            flex: 1;
+            padding: 30px;
+            min-width: 0;
+        }
+
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 27px;
+            color: #172554;
+        }
+
+        .header p {
+            color: #64748b;
+            margin-top: 7px;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #e8edf5;
+            box-shadow: 0 3px 15px #00000008;
+            margin-bottom: 25px;
+        }
+
+        .panel h2 {
+            font-size: 19px;
+            color: #172554;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .error {
+            background: #fef2f2;
+            color: #b91c1c;
+            padding: 13px;
+            border-radius: 7px;
+            margin-bottom: 18px;
+            overflow-wrap: anywhere;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 550px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 14px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #64748b;
+        }
+
+        .deposit {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .withdrawal {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            color: #64748b;
+            padding: 25px;
+        }
+
+        .footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 650px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .main {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="logo">🏦 CUB</div>
+        <div class="brand-name">CHANDIGARH UNIVERSITY BANK</div>
+
+        <p>Main Menu</p>
+
+        <a href="/">📊 Dashboard</a>
+        <a href="/customers">👤 Create Customer</a>
+        <a href="/accounts">🏛️ All Accounts</a>
+
+        <p>Banking Operations</p>
+
+        <a href="/deposit">💰 Deposit Money</a>
+        <a href="/withdraw">💸 Withdraw Money</a>
+        <a href="/balance">📋 Check Balance</a>
+        <a href="/history" class="active">📜 Transaction History</a>
+
+    </aside>
+
+    <main class="main">
+
+        <div class="header">
+            <h1>Transaction History</h1>
+            <p>Chandigarh University Bank – CUB</p>
+        </div>
+
+        <section class="panel">
+
+            <h2>Search Transactions</h2>
+
+            <form method="POST">
+
+                <label for="account_id">Enter Account ID</label>
+
+                <input
+                    type="number"
+                    id="account_id"
+                    name="account_id"
+                    min="1"
+                    value="{{ account_id if account_id else '' }}"
+                    placeholder="Enter your account ID"
+                    required
+                >
+
+                <button type="submit">Search Transactions</button>
+
+            </form>
+
+        </section>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if searched and not error %}
+        <section class="panel">
+
+            <h2>Transaction Records – Account #{{ account_id }}</h2>
+
+            <div class="table-container">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Transaction Type</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for transaction in transactions %}
+
+                        <tr>
+                            <td>#{{ transaction.transaction_id }}</td>
+
+                            <td>
+                                {% if transaction.transaction_type == "DEPOSIT" %}
+                                    <span class="deposit">DEPOSIT</span>
+                                {% else %}
+                                    <span class="withdrawal">WITHDRAWAL</span>
+                                {% endif %}
+                            </td>
+
+                            <td>₹{{ "%.2f"|format(transaction.amount) }}</td>
+
+                            <td>{{ transaction.transaction_date }}</td>
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+                            <td colspan="4" class="empty">
+                                No transactions found for this account.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+            </div>
+
+        </section>
+        {% endif %}
+
+        <div class="footer">
+            © 2026 CUB – Chandigarh University Bank | Academic Project
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>
